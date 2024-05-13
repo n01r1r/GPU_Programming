@@ -37,14 +37,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.frag">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include="shader.geom">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include="shader.vert">
-      <Filter>리소스 파일</Filter>
-    </None>
+    <None Include="shader.frag" />
+    <None Include="shader.geom" />
+    <None Include="shader.vert" />
   </ItemGroup>
 </Project>

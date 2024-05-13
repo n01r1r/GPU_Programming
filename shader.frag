@@ -19,16 +19,11 @@ vec4 shadePerNdotV(){
     else return vec4(1.0);
 }
 
-vec4 drawSilhouette(){
-    
-    if(GIsEdge==1) return vec4(0.0);
-    else return vec4(1.0);
-
-
-}
-
 void main() {
     if(pass==1) FragColor = toonShade();
     if(pass==2) FragColor = shadePerNdotV();
-    if(pass==3) FragColor = drawSilhouette();
+    if(pass==3){
+        if(GIsEdge==1) FragColor = vec4(0.0);
+        else FragColor = vec4(1.0);
+    }
 }

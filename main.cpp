@@ -78,8 +78,8 @@ int main(void) {
 	glewInit();
 	initScene();
 
-	Shader shader("shader.vs", "shader.fs");
-	Shader shader2("shader.vs", "shader.fs", "shader.gs");
+	Shader shader("shader.vert", "shader.frag");
+	Shader shader2("shader.vert", "shader.frag", "shader.geom");
 
 	while (!glfwWindowShouldClose(window)) {
 		
@@ -94,8 +94,6 @@ int main(void) {
 			renderScene(window, &shader2);
 			break;
 		}
-
-		//renderScene(window, &shader);
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();

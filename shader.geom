@@ -3,14 +3,12 @@
 layout( triangles_adjacency ) in;
 layout( triangle_strip, max_vertices = 15 ) out;
 
-out vec3 GNormal;
-out vec3 GPosition;
-
-// Which triangle edges are silhouette edges
-flat out int GIsEdge;
-
 in vec3 VNormal[];
 in vec3 VPosition[];
+
+out vec3 GNormal;
+out vec3 GPosition;
+flat out int GIsEdge;
 
 uniform float EdgeWidth;
 uniform float PctExtend;
