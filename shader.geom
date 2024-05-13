@@ -17,8 +17,7 @@ uniform float PctExtend;
 
 bool isFrontFacing( vec3 a, vec3 b, vec3 c )
 {
-    return ((a.x * b.y - b.x * a.y) + (b.x * c.y - c.x * b.y) + (c.x * a.y - a.x * c.y))
-            > 0;
+    return ((a.x * b.y - b.x * a.y) + (b.x * c.y - c.x * b.y) + (c.x * a.y - a.x * c.y)) > 0;
 }
 
 void emitEdgeQuad( vec3 e0, vec3 e1 )

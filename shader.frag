@@ -9,19 +9,26 @@ flat in int GIsEdge;
 
 out vec4 FragColor;
 
-const int levels = 3;
-const float scaleFactor = 1.0 / levels;
-
-vec3 toonShade( )
+vec4 toonShade( )
 {
-    return vec3(1.0) * ndotv;
+    return vec4(1.0) * ndotv;
+}
+
+vec4 shadePerNdotV(){
+    if(ndotv<=0.25) return vec4(0.0);
+    else return vec4(1.0);
+}
+
+vec4 drawSilhouette(){
+    
+    if(GIsEdge==1) return vec4(0.0);
+    else return vec4(1.0);
+
+
 }
 
 void main() {
-    if( GIsEdge == 1 ) {
-        FragColor = vec4(0.0);
-    } else {
-        FragColor =  vec4( toonShade(), 1.0 );
-    }
-
+    if(pass==1) FragColor = toonShade();
+    if(pass==2) FragColor = shadePerNdotV();
+    if(pass==3) FragColor = drawSilhouette();
 }

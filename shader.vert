@@ -15,8 +15,8 @@ out float ndotv;
 
 void main(void)
 {	
-	vec3 VPosition = vec3(viewMat * modelMat * vec4(in_Position, 1.0));  
-	vec3 VNormal = normalize(normalMat * in_Normal);
+	vec3 VPosition = vec3(modelMat * vec4(in_Position, 1.0));  
+	vec3 VNormal = normalize(in_Normal);
 
 	gl_Position = projMat * viewMat * vec4(VPosition, 1.0);
 

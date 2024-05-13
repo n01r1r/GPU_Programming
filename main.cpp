@@ -43,7 +43,7 @@ GLuint normBuffer = 0;
 GLuint texBuffer = 0;
 
 
-vec3 lightPosition = vec3(3, 10, 5);
+vec3 lightPosition = vec3(0, 2, 5);
 
 
 int input = 1;
@@ -99,7 +99,7 @@ void initScene() {
 
 	// load models and shader programs
 	loadJ3A("./dwarf.j3a");
-	prog.loadShaders("./shader.vert", "./shader.frag", "./shader.geom");
+	prog.loadShaders("./shader.vert", "./shader.frag"); // , "./shader.geom");
 
 	// Scene setup and render
 	glGenBuffers(1, &vBuffer);
