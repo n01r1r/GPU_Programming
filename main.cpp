@@ -4,7 +4,6 @@
 * 2024/05/12, Dongyeob Han
 */
 
-
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
@@ -18,7 +17,7 @@
 
 // Misc
 #include "callback.h"
-#include "toys.h"
+#include "shader.hpp"
 #include "j3a.hpp"
 #include <iostream>
 #include <vector>
@@ -27,14 +26,12 @@ using namespace glm;
 
 
 void initScene();
-void renderScene(GLFWwindow* window);
+void renderScene(GLFWwindow* window, Shader* s);
 
 const int screenWidth = 1200;
 const int screenHeight = 800;
 
 bool isBlur = false;
-
-Program prog;
 
 GLuint vArray = 0;
 GLuint vBuffer = 0;
@@ -68,8 +65,7 @@ int main(void) {
 		return -1;
 	}
 
-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "GPU Assignment 02", NULL, NULL);
-
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "GPU Assignment 03", NULL, NULL);
 	if (!window) {
 		fprintf(stderr, "GLFW Window Failed");
 		glfwTerminate();
@@ -82,11 +78,13 @@ int main(void) {
 	glfwSetScrollCallback(window, scrollCB);
 	glfwMakeContextCurrent(window);
 	glewInit();
-
 	initScene();
 
+	Shader shader("shader.vert", "shader.frag", "shader.geom");
+
 	while (!glfwWindowShouldClose(window)) {
-		renderScene(window);
+		renderScene(window, &shader);
+		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
@@ -97,9 +95,8 @@ int main(void) {
 
 void initScene() {
 
-	// load models and shader programs
+	// load models and shaders
 	loadJ3A("./dwarf.j3a");
-	prog.loadShaders("./shader.vert", "./shader.frag"); // , "./shader.geom");
 
 	// Scene setup and render
 	glGenBuffers(1, &vBuffer);
@@ -127,7 +124,7 @@ void initScene() {
 
 }
 
-void renderScene(GLFWwindow* window) {
+void renderScene(GLFWwindow* window, Shader* shader) {
 
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
@@ -149,38 +146,34 @@ void renderScene(GLFWwindow* window) {
 	glClearColor(.7, .7, .7, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-	GLuint loc = glGetUniformLocation(prog.programID, "projMat");
+	
+
+	GLuint loc = glGetUniformLocation(shader->ID, "projMat");
 	glUniformMatrix4fv(loc, 1, false, glm::value_ptr(projMat));
 
-	loc = glGetUniformLocation(prog.programID, "viewMat");
+	loc = glGetUniformLocation(shader->ID, "viewMat");
 	glUniformMatrix4fv(loc, 1, false, glm::value_ptr(viewMat));
 
-	loc = glGetUniformLocation(prog.programID, "modelMat");
+	loc = glGetUniformLocation(shader->ID, "modelMat");
 	glUniformMatrix4fv(loc, 1, false, glm::value_ptr(modelMat));
 
-	loc = glGetUniformLocation(prog.programID, "normalMat");
+	loc = glGetUniformLocation(shader->ID, "normalMat");
 	glUniformMatrix3fv(loc, 1, false, glm::value_ptr(normalMat));
 
-	loc = glGetUniformLocation(prog.programID, "lightPosition");
+	loc = glGetUniformLocation(shader->ID, "lightPosition");
 	glUniform3fv(loc, 1, glm::value_ptr(lightPosition));
 
-	loc = glGetUniformLocation(prog.programID, "cameraPosition");
+	loc = glGetUniformLocation(shader->ID, "cameraPosition");
 	glUniform3fv(loc, 1, glm::value_ptr(cameraPosition));
 
-	loc = glGetUniformLocation(prog.programID, "diffColor");
-	glUniform3fv(loc, 1, glm::value_ptr(diffuseColor[0]));
+	//loc = glGetUniformLocation(shader->ID, "pass");
+	//glUniform1i(loc, input);
 
-	loc = glGetUniformLocation(prog.programID, "specColor");
-	glUniform3fv(loc, 1, glm::value_ptr(specularColor[0]));
-
-	loc = glGetUniformLocation(prog.programID, "shininess");
-	glUniform1f(loc, shininess[0]);
-
-	loc = glGetUniformLocation(prog.programID, "pass");
-	glUniform1i(loc, input);
+	shader->setInt("pass", input);
+	shader->setFloat("EdgeWidth", 0.015f);
+	shader->setFloat("PctExtend", 0.25f);
 
 	glBindVertexArray(vArray);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxBuffer);
 	glDrawElements(GL_TRIANGLES, nTriangles[0] * 3, GL_UNSIGNED_INT, 0);
-	glfwSwapBuffers(window);
 }

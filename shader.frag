@@ -1,4 +1,4 @@
- #version 400
+#version 150 core
 
 uniform int	pass;
 

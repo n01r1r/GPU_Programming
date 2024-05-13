@@ -140,8 +140,8 @@
   <ItemGroup>
     <ClInclude Include="callback.h" />
     <ClInclude Include="j3a.hpp" />
+    <ClInclude Include="shader.hpp" />
     <ClInclude Include="stb_image.h" />
-    <ClInclude Include="toys.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.frag" />

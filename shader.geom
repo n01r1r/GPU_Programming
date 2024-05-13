@@ -1,12 +1,10 @@
-﻿#version 400
-
-layout( triangles_adjacency ) in;
-layout( triangle_strip, max_vertices = 15 ) out;
+﻿#version 410 core
+layout(triangles_adjacency) in;
+layout(triangle_strip, max_vertices=15) out;
 
 out vec3 GNormal;
 out vec3 GPosition;
 
-// Which triangle edges are silhouette edges
 flat out int GIsEdge;
 
 in vec3 VNormal[];
@@ -26,7 +24,7 @@ void emitEdgeQuad( vec3 e0, vec3 e1 )
     vec2 v = normalize(e1.xy - e0.xy);
     vec2 n = vec2(-v.y, v.x) * EdgeWidth;
 
-    GIsEdge = 1;   // This is part of the sil. edge
+    GIsEdge = 1; // this is part of an edge
 
     gl_Position = vec4( e0.xy - ext, e0.z, 1.0 ); EmitVertex();
     gl_Position = vec4( e0.xy - n - ext, e0.z, 1.0 ); EmitVertex();
@@ -53,7 +51,7 @@ void main()
 
     // Output the original triangle
 
-    GIsEdge = 0;   // This triangle is not part of an edge.
+    GIsEdge = 0; // this is not part of an edge
 
     GNormal = VNormal[0];
     GPosition = VPosition[0];
