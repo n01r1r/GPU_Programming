@@ -47,8 +47,6 @@ int input = 1;
 
 void keyCB(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (key == GLFW_KEY_G && action == GLFW_PRESS) isBlur = !isBlur;
-
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS) input = 1;
 
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS) input = 2;
@@ -80,10 +78,25 @@ int main(void) {
 	glewInit();
 	initScene();
 
-	Shader shader("shader.vert", "shader.frag", "shader.geom");
+	Shader shader("shader.vs", "shader.fs");
+	Shader shader2("shader.vs", "shader.fs", "shader.gs");
 
 	while (!glfwWindowShouldClose(window)) {
-		renderScene(window, &shader);
+		
+		switch (input) {
+		case 1:
+			renderScene(window, &shader);
+			break;
+		case 2:
+			renderScene(window, &shader);
+			break;
+		case 3:
+			renderScene(window, &shader2);
+			break;
+		}
+
+		//renderScene(window, &shader);
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -97,7 +110,7 @@ void initScene() {
 
 	// load models and shaders
 	loadJ3A("./dwarf.j3a");
-
+	
 	// Scene setup and render
 	glGenBuffers(1, &vBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
@@ -124,7 +137,7 @@ void initScene() {
 
 }
 
-void renderScene(GLFWwindow* window, Shader* shader) {
+void renderScene(GLFWwindow* window, Shader* s) {
 
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
@@ -135,6 +148,8 @@ void renderScene(GLFWwindow* window, Shader* shader) {
 		* rotate(mat4(1), phi, vec3(1, 0, 0))
 		* vec4(cameraPosition, 1)
 	);
+
+	s->use(); 
 
 	mat4 projMat = perspective(radians(fov), w / float(h), 0.1f, 100.f);
 	mat4 viewMat = lookAt(cameraPosition, vec3(0), vec3(0, 1, 0));
@@ -147,31 +162,18 @@ void renderScene(GLFWwindow* window, Shader* shader) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
 	
+	s->setMat4("projMat", projMat);
+	s->setMat4("viewMat", viewMat);
+	s->setMat4("modelMat", modelMat);
+	s->setMat4("normalMat", normalMat);
 
-	GLuint loc = glGetUniformLocation(shader->ID, "projMat");
-	glUniformMatrix4fv(loc, 1, false, glm::value_ptr(projMat));
+	s->setVec3("lightPosition", lightPosition);
+	s->setVec3("cameraPosition", cameraPosition);
+	
+	s->setInt("pass", input);
 
-	loc = glGetUniformLocation(shader->ID, "viewMat");
-	glUniformMatrix4fv(loc, 1, false, glm::value_ptr(viewMat));
-
-	loc = glGetUniformLocation(shader->ID, "modelMat");
-	glUniformMatrix4fv(loc, 1, false, glm::value_ptr(modelMat));
-
-	loc = glGetUniformLocation(shader->ID, "normalMat");
-	glUniformMatrix3fv(loc, 1, false, glm::value_ptr(normalMat));
-
-	loc = glGetUniformLocation(shader->ID, "lightPosition");
-	glUniform3fv(loc, 1, glm::value_ptr(lightPosition));
-
-	loc = glGetUniformLocation(shader->ID, "cameraPosition");
-	glUniform3fv(loc, 1, glm::value_ptr(cameraPosition));
-
-	//loc = glGetUniformLocation(shader->ID, "pass");
-	//glUniform1i(loc, input);
-
-	shader->setInt("pass", input);
-	shader->setFloat("EdgeWidth", 0.015f);
-	shader->setFloat("PctExtend", 0.25f);
+	s->setFloat("EdgeWidth", 0.015f);
+	s->setFloat("PctExtend", 0.25f);
 
 	glBindVertexArray(vArray);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxBuffer);
