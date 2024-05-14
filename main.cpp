@@ -170,8 +170,8 @@ void renderScene(GLFWwindow* window, Shader* s) {
 	
 	s->setInt("pass", input);
 
-	s->setFloat("edgeWidth", 0.015f);
-	s->setFloat("pctExtend", 0.25f);
+	s->setFloat("edgeWidth", 0.0075f);
+	s->setFloat("pctExtend", 0.5f);
 
 	glBindVertexArray(vArray);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxBuffer);

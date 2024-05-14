@@ -23,9 +23,9 @@ flat out int GIsEdge;
 void emitEdgeQuad(vec3 a, vec3 b){
 
 	GIsEdge = 1;
-	vec2 ext	= 0.5 * ( b.xy - a.xy );
+	vec2 ext	= pctExtend * ( b.xy - a.xy );
 	vec2 v		= normalize( b.xy - a.xy);
-	vec2 n		= vec2(-v.y, v.x) * 0.05f;
+	vec2 n		= vec2(-v.y, v.x) * edgeWidth;
 
 	gl_Position = vec4(a.xy - ext - n, a.z, 1.0); EmitVertex();
 	gl_Position = vec4(a.xy - ext + n, a.z, 1.0); EmitVertex();
@@ -46,17 +46,21 @@ void findEdge(){
 	float nv1 = gs_in[1].ndv;
 	float nv2 = gs_in[2].ndv;
 
-	if((nv0*nv1 < 0) && (nv1*nv2 > 0)){
+	bool b0 = nv0 <= 0;
+	bool b1 = nv1 <= 0;
+	bool b2 = nv2 <= 0;
+
+	if(b0!=b1 && b1==b2){
 		e0 = mix(p0, p1, nv0/(nv0-nv1));
 		e1 = mix(p0, p2, nv0/(nv0-nv2));
 		emitEdgeQuad(e0, e1);
 	}
-	else if ((nv0*nv1 < 0) && (nv0*nv2 > 0)){
+	else if (b0!=b1&&b0==b2){
 		e0 = mix(p1, p0, nv1/(nv1-nv0));
 		e1 = mix(p1, p2, nv1/(nv1-nv2));
 		emitEdgeQuad(e0, e1);
 	}
-	else if ((nv0*nv2 < 0) && (nv0*nv2 > 0)){
+	else if (b0!=b2&&b0==b1){
 		e0 = mix(p2, p0, nv2/(nv2-nv0));
 		e1 = mix(p2, p1, nv2/(nv2-nv1));
 		emitEdgeQuad(e0, e1);
