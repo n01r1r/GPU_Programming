@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{814c9614-003e-4b2e-8815-b4199cdab989}</ProjectGuid>
-    <RootNamespace>GPU02</RootNamespace>
+    <RootNamespace>GPU03</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>GPU03</ProjectName>
   </PropertyGroup>

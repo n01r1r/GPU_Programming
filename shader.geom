@@ -1,4 +1,4 @@
-#version 410 core
+#version 430 core
 
 layout( triangles ) in;
 layout( triangle_strip, max_vertices = 7 ) out;
@@ -27,8 +27,8 @@ void emitEdgeQuad(vec3 a, vec3 b){
 	vec2 v		= normalize( b.xy - a.xy);
 	vec2 n		= vec2(-v.y, v.x) * edgeWidth;
 
-	gl_Position = vec4(a.xy - ext - n, a.z, 1.0); EmitVertex();
 	gl_Position = vec4(a.xy - ext + n, a.z, 1.0); EmitVertex();
+	gl_Position = vec4(a.xy - ext - n, a.z, 1.0); EmitVertex();
 	gl_Position = vec4(b.xy + ext + n, b.z, 1.0); EmitVertex();
 	gl_Position - vec4(b.xy + ext - n, b.z, 1.0); EmitVertex();
 
@@ -36,7 +36,9 @@ void emitEdgeQuad(vec3 a, vec3 b){
 }
 
 void findEdge(){
-	vec3 e0, e1; // target edge points
+	
+	
+	vec3 e0, e1;
 
 	vec3 p0 = gl_in[0].gl_Position.xyz / gl_in[0].gl_Position.w;
 	vec3 p1 = gl_in[1].gl_Position.xyz / gl_in[1].gl_Position.w;
