@@ -78,17 +78,17 @@ int main(void) {
 	glewInit();
 	initScene();
 
-	Shader shader("shader.vert", "shader.frag");
+	Shader shader1("ndv.vert", "ndv.frag");
 	Shader shader2("shader.vert", "shader.frag", "shader.geom");
 
 	while (!glfwWindowShouldClose(window)) {
 		
 		switch (input) {
 		case 1:
-			renderScene(window, &shader);
+			renderScene(window, &shader1);
 			break;
 		case 2:
-			renderScene(window, &shader);
+			renderScene(window, &shader1);
 			break;
 		case 3:
 			renderScene(window, &shader2);
@@ -170,8 +170,8 @@ void renderScene(GLFWwindow* window, Shader* s) {
 	
 	s->setInt("pass", input);
 
-	s->setFloat("EdgeWidth", 0.015f);
-	s->setFloat("PctExtend", 0.25f);
+	s->setFloat("edgeWidth", 0.015f);
+	s->setFloat("pctExtend", 0.25f);
 
 	glBindVertexArray(vArray);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxBuffer);

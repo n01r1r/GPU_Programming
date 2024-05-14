@@ -140,13 +140,16 @@
   <ItemGroup>
     <ClInclude Include="callback.h" />
     <ClInclude Include="j3a.hpp" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="shader.hpp" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ndv.frag" />
+    <None Include="ndv.vert" />
     <None Include="shader.frag" />
-    <None Include="shader.geom" />
     <None Include="shader.vert" />
+    <None Include="shader.geom" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

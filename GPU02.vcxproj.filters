@@ -35,10 +35,25 @@
     <ClInclude Include="shader.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.frag" />
-    <None Include="shader.geom" />
-    <None Include="shader.vert" />
+    <None Include="shader.frag">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="shader.vert">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="shader.geom">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="ndv.frag">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="ndv.vert">
+      <Filter>리소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,29 +1,15 @@
-#version 150 core
+#version 410 core
+
+in GS_FS{
+	in vec3 GNormal;
+	in vec3 GPosition;
+} gs_out;
 
 uniform int	pass;
-
-in float	ndotv;
-in vec3 GPosition;
-in vec3 GNormal;
 flat in int GIsEdge;
-
 out vec4 FragColor;
 
-vec4 toonShade( )
-{
-    return vec4(1.0) * ndotv;
-}
-
-vec4 shadePerNdotV(){
-    if(ndotv<=0.25) return vec4(0.0);
-    else return vec4(1.0);
-}
-
 void main() {
-    if(pass==1) FragColor = toonShade();
-    if(pass==2) FragColor = shadePerNdotV();
-    if(pass==3){
-        if(GIsEdge==1) FragColor = vec4(0.0);
-        else FragColor = vec4(1.0);
-    }
+    if(GIsEdge==1) FragColor = vec4(0.5, 0.5, 0.0, 1.0);
+    else FragColor = vec4(1.0);
 }

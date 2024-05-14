@@ -1,72 +1,89 @@
 #version 410 core
 
-layout( triangles_adjacency ) in;
-layout( triangle_strip, max_vertices = 15 ) out;
+layout( triangles ) in;
+layout( triangle_strip, max_vertices = 7 ) out;
 
-in vec3 VNormal[];
-in vec3 VPosition[];
+uniform float pctExtend;
+uniform float edgeWidth;
 
-out vec3 GNormal;
-out vec3 GPosition;
+in VS_GS{
+	in vec3 VNormal;
+	in vec3 VPosition;
+	// ndotv도 triangle마다 넘어와야 interpolation함
+	in float ndv;
+} gs_in[];
+
+out GS_FS{
+	out vec3 GNormal;
+	out vec3 GPosition;
+} gs_out;
+
 flat out int GIsEdge;
 
-uniform float EdgeWidth;
-uniform float PctExtend;
+void emitEdgeQuad(vec3 a, vec3 b){
 
-bool isFrontFacing( vec3 a, vec3 b, vec3 c )
-{
-    return ((a.x * b.y - b.x * a.y) + (b.x * c.y - c.x * b.y) + (c.x * a.y - a.x * c.y)) > 0;
+	GIsEdge = 1;
+	vec2 ext	= 0.5 * ( b.xy - a.xy );
+	vec2 v		= normalize( b.xy - a.xy);
+	vec2 n		= vec2(-v.y, v.x) * 0.05f;
+
+	gl_Position = vec4(a.xy - ext - n, a.z, 1.0); EmitVertex();
+	gl_Position = vec4(a.xy - ext + n, a.z, 1.0); EmitVertex();
+	gl_Position = vec4(b.xy + ext + n, b.z, 1.0); EmitVertex();
+	gl_Position - vec4(b.xy + ext - n, b.z, 1.0); EmitVertex();
+
+	EndPrimitive();
 }
 
-void emitEdgeQuad( vec3 e0, vec3 e1 )
-{
-    vec2 ext = PctExtend * (e1.xy - e0.xy);
-    vec2 v = normalize(e1.xy - e0.xy);
-    vec2 n = vec2(-v.y, v.x) * EdgeWidth;
+void findEdge(){
+	vec3 e0, e1; // target edge points
 
-    GIsEdge = 1;   // This is part of the sil. edge
+	vec3 p0 = gl_in[0].gl_Position.xyz / gl_in[0].gl_Position.w;
+	vec3 p1 = gl_in[1].gl_Position.xyz / gl_in[1].gl_Position.w;
+	vec3 p2 = gl_in[2].gl_Position.xyz / gl_in[2].gl_Position.w;
 
-    gl_Position = vec4( e0.xy - ext, e0.z, 1.0 ); EmitVertex();
-    gl_Position = vec4( e0.xy - n - ext, e0.z, 1.0 ); EmitVertex();
-    gl_Position = vec4( e1.xy + ext, e1.z, 1.0 ); EmitVertex();
-    gl_Position = vec4( e1.xy - n + ext, e1.z, 1.0 ); EmitVertex();
+	float nv0 = gs_in[0].ndv;
+	float nv1 = gs_in[1].ndv;
+	float nv2 = gs_in[2].ndv;
 
-    EndPrimitive();
+	if((nv0*nv1 < 0) && (nv1*nv2 > 0)){
+		e0 = mix(p0, p1, nv0/(nv0-nv1));
+		e1 = mix(p0, p2, nv0/(nv0-nv2));
+		emitEdgeQuad(e0, e1);
+	}
+	else if ((nv0*nv1 < 0) && (nv0*nv2 > 0)){
+		e0 = mix(p1, p0, nv1/(nv1-nv0));
+		e1 = mix(p1, p2, nv1/(nv1-nv2));
+		emitEdgeQuad(e0, e1);
+	}
+	else if ((nv0*nv2 < 0) && (nv0*nv2 > 0)){
+		e0 = mix(p2, p0, nv2/(nv2-nv0));
+		e1 = mix(p2, p1, nv2/(nv2-nv1));
+		emitEdgeQuad(e0, e1);
+	}
+
 }
 
-void main()
-{
-    vec3 p0 = gl_in[0].gl_Position.xyz / gl_in[0].gl_Position.w;
-    vec3 p1 = gl_in[1].gl_Position.xyz / gl_in[1].gl_Position.w;
-    vec3 p2 = gl_in[2].gl_Position.xyz / gl_in[2].gl_Position.w;
-    vec3 p3 = gl_in[3].gl_Position.xyz / gl_in[3].gl_Position.w;
-    vec3 p4 = gl_in[4].gl_Position.xyz / gl_in[4].gl_Position.w;
-    vec3 p5 = gl_in[5].gl_Position.xyz / gl_in[5].gl_Position.w;
+void main(){
+	
+	findEdge();
+	
+	// non-edge triangles
+	GIsEdge = 0;
+	gl_Position = gl_in[0].gl_Position;
+	gs_out.GPosition = gs_in[0].VPosition;
+	gs_out.GNormal = gs_in[0].VNormal;
+	EmitVertex();
 
-    if( isFrontFacing(p0, p2, p4) ) {
-        if( ! isFrontFacing(p0,p1,p2) ) emitEdgeQuad(p0,p2);
-        if( ! isFrontFacing(p2,p3,p4) ) emitEdgeQuad(p2,p4);
-        if( ! isFrontFacing(p4,p5,p0) ) emitEdgeQuad(p4,p0);
-    }
+	gl_Position = gl_in[1].gl_Position;
+	gs_out.GPosition = gs_in[1].VPosition;
+	gs_out.GNormal = gs_in[1].VNormal;
+	EmitVertex();
 
-    // Output the original triangle
+	gl_Position = gl_in[2].gl_Position;
+	gs_out.GPosition = gs_in[2].VPosition;
+	gs_out.GNormal = gs_in[2].VNormal;
+	EmitVertex();
 
-    GIsEdge = 0;   // This triangle is not part of an edge.
-
-    GNormal = VNormal[0];
-    GPosition = VPosition[0];
-    gl_Position = gl_in[0].gl_Position;
-    EmitVertex();
-
-    GNormal = VNormal[2];
-    GPosition = VPosition[2];
-    gl_Position = gl_in[2].gl_Position;
-    EmitVertex();
-
-    GNormal = VNormal[4];
-    GPosition = VPosition[4];
-    gl_Position = gl_in[4].gl_Position;
-    EmitVertex();
-
-    EndPrimitive();
+	EndPrimitive();
 }
